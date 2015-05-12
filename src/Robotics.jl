@@ -45,8 +45,11 @@
 
 # Code:
 
-module Robotics.jl
+module Robotics
 
+include("transformations.jl")
+include("robots_types.jl")
+include("utility.jl")
 
 end
 # 
