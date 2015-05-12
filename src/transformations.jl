@@ -38,7 +38,7 @@ module transformation
 # Imports
 #*************************************************************************
 
-import Base.inv
+import Base.inv, Base.show
 
 
 #*************************************************************************
@@ -96,10 +96,17 @@ immutable Pose2D <: Number
     
     function Pose2D(x::Real,y::Real,θ::Real)
     
-        ξ = [cos(θ) sin(θ) x;-sin(θ) cos(θ) y;0 0 1]
+        ξ = [cos(θ) -sin(θ) x;sin(θ) cos(θ) y;0.0 0.0 1.0]
         new(x,y,θ,ξ)
     end
     
+end
+
+#-------------------------------------------------------------------------
+# Show 
+#-------------------------------------------------------------------------
+function show(io::IO,p::Pose2D)
+    print(io,p.ξ)
 end
 
 #-------------------------------------------------------------------------
@@ -118,15 +125,19 @@ end
 
 # Product
 function ⊕(p1::Pose2D, p2::Pose2D)
-    p3 = Pose2D(0,0,0)
-    p3.ξ = p1.ξ * p2.ξ
+    p3 = Pose2D(0,0,0) # Pose type
+    p3.ξ = p1.ξ * p2.ξ 
+    p3.x = p3.ξ[1,3]
+    p3.y = p3.ξ[2,3]
+    p3.θ = p1.θ + p2.θ
     return p3
 end
+
 #*************************************************************************
 # Exports
 #*************************************************************************
 
-export rotz, rotx, roty
+export rotz, rotx, roty, Pose2D, inv, show, ⊕
 
 # 
 # transformations.jl ends here
