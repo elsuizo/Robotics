@@ -1,10 +1,10 @@
-# Robotics.jl --- 
+# graphics.jl --- 
 # 
-# Filename: Robotics.jl
+# Filename: graphics.jl
 # Description: 
 # Author: Martin Noblía
 # Maintainer: 
-# Created: Sat Apr 25 18:21:47 2015 (-0300)
+# Created: mié may 13 18:26:58 2015 (-0300)
 # Version: 0.0.1
 # Package-Requires: ()
 # Last-Updated: 
@@ -15,12 +15,9 @@
 # Keywords: 
 # Compatibility: 
 # 
+# 
+
 # Commentary: 
-# 
-# 
-# 
-# 
-# Change Log:
 # 
 # 
 # This program is free software: you can redistribute it and/or modify
@@ -34,16 +31,10 @@
 # General Public License for more details.
 # 
 # You should have received a copy of the GNU General Public License
+
 # Code:
 
-module Robotics
 
-include("transformations.jl")
-include("robots_types.jl")
-include("utility.jl")
 
-export Pose2D, ⊖, ⊕, rotx, roty, rotz, show
-
-end
 # 
-# Robotics.jl ends here
+# graphics.jl ends here
