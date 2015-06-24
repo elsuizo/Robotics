@@ -36,7 +36,7 @@
 # Imports
 #*************************************************************************
 
-import Base.show
+import Base.show, Base.*, Base.size
 using Docile
 
 #*************************************************************************
@@ -55,7 +55,12 @@ Output:
 ------
 
 Rₓ : Rotation matrix of angle Input
-# """ ->
+
+example:
+-------
+
+`R = rotx(deg2rad(30)) # rotation around x 30 degrees`
+ """ ->
 function rotx(∠::Number)
     
     Rₓ = [1   0       0;
@@ -64,6 +69,8 @@ function rotx(∠::Number)
 
     return Rₓ
 end
+
+
 @doc """
 Compute the rotation around the `y` axis(in cartesian coordinates)
 
@@ -76,7 +83,12 @@ Output:
 ------
 
 R_y: Rotation matrix of angle Input
-# """ ->
+
+example:
+-------
+`R = roty(deg2rad(30)) # rotation around y 30 degrees`
+
+ """ ->
 function roty(∠::Number)
 
     R_y = [cos(∠)  0  sin(∠);
@@ -85,6 +97,7 @@ function roty(∠::Number)
 
     return R_y
 end
+
 
 @doc """
 Compute the rotation around the `z` axis(in cartesian coordinates)
@@ -98,9 +111,12 @@ Output:
 ------
 
 R_z: Rotation matrix of angle Input
-# """ ->
 
+example:
+-------
 
+`R = rotz(deg2rad(30)) # rotation around z 30 degrees`
+""" ->
 function rotz(∠::Number)
 
     R_z = [cos(∠)  -sin(∠) 0;
@@ -111,30 +127,56 @@ function rotz(∠::Number)
 end
 
 
+#-------------------------------------------------------------------------
+# Point Type
+#-------------------------------------------------------------------------
+@doc """
+Point2D type container for a cartesian 2D-Point 
+
+example:
+-------
+
+`p = Point2D(1,1) # x=1, y=1`
+
+""" ->
+immutable Point2D{T} <: Number
+    x :: T
+    y :: T
+end
+Point2D() = Point2D(0, 0) # canonical point2d
 #*************************************************************************
 # Pose type 
 #*************************************************************************
-type Pose2D <: Number
+# TODO(elsuizo): look what is the better type to hierarchy
+type Pose2D <: Number 
     x::Real
     y::Real
     θ::Real
     ξ::Array{Float64,2}
     
-    function Pose2D(x::Real,y::Real,θ::Real)
+    function Pose2D(x::Real, y::Real, θ::Real)
     
         ξ = [cos(θ) -sin(θ) x;sin(θ) cos(θ) y;0.0 0.0 1.0]
-        new(x,y,θ,ξ)
+        new(x , y, θ, ξ)
     end
-    
+    function Pose2D(p::Point2D, θ::Real)
+        ξ = [cos(θ) -sin(θ) p.x;sin(θ) cos(θ) p.y;0.0 0.0 1.0]
+        new(p.x, p.y, θ, ξ)
+    end
 end
 
-Pose2D() = Pose2D(0.0,0.0,0.0) # Canonical Pose
+Pose2D() = Pose2D(0.0, 0.0, 0.0) # canonical Pose
 #-------------------------------------------------------------------------
 # Show 
 #-------------------------------------------------------------------------
-function show(io::IO,p::Pose2D)
+function show(io::IO, p::Pose2D)
     print(io,p.ξ)
 end
+
+#-------------------------------------------------------------------------
+# Size of 
+#-------------------------------------------------------------------------
+size(p::Pose2D) = size(p.ξ)
 
 #-------------------------------------------------------------------------
 # Maths with Pose
@@ -147,7 +189,7 @@ function ⊖(p::Pose2D)
     
     p.ξ[1:2,1:2] = p.ξ[1:2,1:2]'
     
-    p.ξ[1:2,3] = -p.ξ[1:2,1:2]' * p.ξ[1:2,3]
+    p.ξ[1:2,3] = -p.ξ[1:2,1:2] * p.ξ[1:2,3]
     
     return p
 end
@@ -163,8 +205,15 @@ function ⊕(p1::Pose2D, p2::Pose2D)
     return p3
 end
 
+function *(p1::Pose2D, p::Point2D)
+   p2 = p1.ξ * [p.x, p.y, 1]
+   return Point2D(p2[1], p2[2])
+end
 
+function *{T}(p1::Pose2D, p::Array{T, 2})
+    p2 = p1.ξ * p
+    return Point2D(p2[1], p2[2])
+end
 
-#**************************************************************************
 # transformations.jl ends here
 #**************************************************************************

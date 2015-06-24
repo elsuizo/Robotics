@@ -38,7 +38,7 @@
 
 module Robotics
 
-export Pose2D, ⊖, ⊕, rotx, roty, rotz, show
+export Point2D, Pose2D, ⊖, ⊕, rotx, roty, rotz, show, *
 
 include("transformations.jl")
 include("robots_types.jl")
