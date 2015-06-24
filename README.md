@@ -1,4 +1,7 @@
 # Robot
-Robotic toolbox
+Robotic toolbox in Julia language
+---------------------------------
 
-examples notebook: http://nbviewer.ipython.org/github/elsuizo/Robotics/blob/master/examples.ipynb
+This toolbox it's inspired in the book: "Robotics,Vision and Control" by *Peter Corke*
+
+
