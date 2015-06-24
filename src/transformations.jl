@@ -44,13 +44,16 @@ using Docile
 #*************************************************************************
 
 @doc """
-`rotx(∠::Number)` 
 Compute the rotation around the `x` axis(in cartesian coordinates)
+
 Input:
 -----
+
 ∠ : Angle(Number)
+
 Output:
 ------
+
 Rₓ : Rotation matrix of angle Input
 # """ ->
 function rotx(∠::Number)
@@ -61,10 +64,18 @@ function rotx(∠::Number)
 
     return Rₓ
 end
+@doc """
+Compute the rotation around the `y` axis(in cartesian coordinates)
 
-# @doc """
+Input:
+-----
 
+∠ : Angle(Number)
 
+Output:
+------
+
+R_y: Rotation matrix of angle Input
 # """ ->
 function roty(∠::Number)
 
@@ -75,10 +86,21 @@ function roty(∠::Number)
     return R_y
 end
 
-# @doc """
+@doc """
+Compute the rotation around the `z` axis(in cartesian coordinates)
 
+Input:
+-----
 
+∠ : Angle(Number)
+
+Output:
+------
+
+R_z: Rotation matrix of angle Input
 # """ ->
+
+
 function rotz(∠::Number)
 
     R_z = [cos(∠)  -sin(∠) 0;
