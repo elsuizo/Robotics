@@ -36,7 +36,7 @@
 # Imports
 #*************************************************************************
 
-import Base.show, Base.*, Base.size
+import Base: show, *, size, +
 using Docile
 
 #*************************************************************************
@@ -139,29 +139,48 @@ example:
 `p = Point2D(1,1) # x=1, y=1`
 
 """ ->
-immutable Point2D{T} <: Number
+immutable Point2D{T<:Real} <: Number
     x :: T
     y :: T
 end
+#-------------------------------------------------------------------------
+# maths Point2d
+#-------------------------------------------------------------------------
+# promote Point2d
+Point2D(x::Real, y::Real) = Point2D(promote(x, y)...)
+
 Point2D() = Point2D(0, 0) # canonical point2d
+# sum of Point2d
++(p1::Point2D, p2::Point2D) = Point2D(p1.x + p2.x, p1.y + p2.y) 
+# mul Array--Point2d
+function *{T}(A::Array{T,2}, p::Point2D) 
+
+   p2 = A * [p.x,p.y,1]
+   
+   return Point2D(p2[1], p2[2])
+   
+end
 #*************************************************************************
 # Pose type 
 #*************************************************************************
 # TODO(elsuizo): look what is the better type to hierarchy
+@doc """
+Pose2D:
+
+"""->
 type Pose2D <: Number 
-    x::Real
-    y::Real
+    p::Point2D
     θ::Real
     ξ::Array{Float64,2}
     
     function Pose2D(x::Real, y::Real, θ::Real)
-    
-        ξ = [cos(θ) -sin(θ) x;sin(θ) cos(θ) y;0.0 0.0 1.0]
-        new(x , y, θ, ξ)
+        p = Point2D(x, y) 
+        ξ = [cos(θ) -sin(θ) p.x;sin(θ) cos(θ) p.y;0.0 0.0 1.0]
+        new(p, θ, ξ)
     end
     function Pose2D(p::Point2D, θ::Real)
         ξ = [cos(θ) -sin(θ) p.x;sin(θ) cos(θ) p.y;0.0 0.0 1.0]
-        new(p.x, p.y, θ, ξ)
+        new(p, θ, ξ)
     end
 end
 
@@ -199,8 +218,7 @@ end
 function ⊕(p1::Pose2D, p2::Pose2D)
     p3 = Pose2D() # Pose type
     p3.ξ = p1.ξ * p2.ξ 
-    p3.x = p3.ξ[1,3]
-    p3.y = p3.ξ[2,3]
+    p3.p = p1.p + p1.ξ * p2.p 
     p3.θ = p1.θ + p2.θ
     return p3
 end
