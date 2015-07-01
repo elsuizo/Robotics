@@ -128,7 +128,7 @@ end
 
 
 #-------------------------------------------------------------------------
-# Point Type
+# Points Types
 #-------------------------------------------------------------------------
 @doc """
 Point2D type container for a cartesian 2D-Point 
@@ -160,12 +160,28 @@ function *{T}(A::Array{T,2}, p::Point2D)
    return Point2D(p2[1], p2[2])
    
 end
+
+@doc """
+
+Point type container for a 3-D cartesian Point representation
+
+example:
+-------
+
+`p = Point(1, 1, 1) # x=1, y=1, z=1`
+"""
+immutable Point{T<:Real} <: Number
+    x::T
+    y::T
+    z::T
+end
+
 #*************************************************************************
 # Pose type 
 #*************************************************************************
 # TODO(elsuizo): look what is the better type to hierarchy
 @doc """
-Pose2D:
+A frame or Pose is a point with associated orientation
 
 """->
 type Pose2D <: Number 
