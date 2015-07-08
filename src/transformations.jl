@@ -126,6 +126,47 @@ function rotz(∠::Number)
     return R_z
 end
 
+@doc """
+Compute the rotation Matrix from Euler angles from the convention ZYZ
+
+Inputs:
+------
+ϕ: first angle of euler(Number)
+θ: second angle of euler(Number)
+ψ: third angle of euler(Number)
+
+Output:
+------
+
+R: Rotation matrix(3x3 Array{Float64, 2})
+""" ->
+function euler2rot(ϕ::Number, θ::Number, ψ::Number)
+
+    return R = rotz(ϕ) * roty(θ) * rotz(ψ)
+end
+
+function rot2euler(R::Array{Float64, 2})
+
+    if abs(R[1,3]) < eps(Float64) && abs(R[2,3]) < eps(Float64)
+        # singularity
+        ϕ = 0.0
+        sp = 0.0
+        cp = 1.0
+        θ = atan2(cp * R[1, 3] + sp * R[2, 3], R[3, 3])
+        ψ = atan2(-sp * R[1, 1] + cp * R[2, 1], -sp * R[1, 2] + cp * R[2, 2])
+    else
+        # non-singular
+        ϕ = atan2(R[2, 3], R[1, 3])
+        sp = sin(ϕ)
+        cp = cos(ϕ)
+        θ = atan2(cp * R[1, 3] + sp * R[2, 3], R[3, 3])
+        ψ = atan2(-sp * R[1, 1] + cp * R[2, 1], -sp * R[1, 2] + cp * R[2, 2])
+    end
+
+    return ϕ, θ, ψ
+end
+
+
 
 #-------------------------------------------------------------------------
 # Points Types
@@ -169,7 +210,8 @@ example:
 -------
 
 `p = Point(1, 1, 1) # x=1, y=1, z=1`
-"""
+
+""" ->
 immutable Point{T<:Real} <: Number
     x::T
     y::T
@@ -187,7 +229,7 @@ A frame or Pose is a point with associated orientation
 type Pose2D <: Number 
     p::Point2D
     θ::Real
-    ξ::Array{Float64,2}
+    ξ::Array{Float64, 2}
     
     function Pose2D(x::Real, y::Real, θ::Real)
         p = Point2D(x, y) 
