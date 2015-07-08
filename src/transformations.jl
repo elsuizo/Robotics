@@ -35,13 +35,12 @@
 #*************************************************************************
 # Imports
 #*************************************************************************
-
 import Base: show, *, size, +
 using Docile
-
 #*************************************************************************
 # Rotations
 #*************************************************************************
+
 
 @doc """
 Compute the rotation around the `x` axis(in cartesian coordinates)
@@ -126,6 +125,7 @@ function rotz(∠::Number)
     return R_z
 end
 
+
 @doc """
 Compute the rotation Matrix from Euler angles from the convention ZYZ
 
@@ -145,6 +145,23 @@ function euler2rot(ϕ::Number, θ::Number, ψ::Number)
     return R = rotz(ϕ) * roty(θ) * rotz(ψ)
 end
 
+
+@doc """
+Compute the euler angles from a Rotation matrix(ZYZ convention)
+
+Input:
+-----
+
+R: Rotation matrix(Array{Float64, 2})
+
+Outputs:
+------
+
+ϕ: first angle of euler(Number)
+θ: second angle of euler(Number)
+ψ: third angle of euler(Number)
+
+""" ->
 function rot2euler(R::Array{Float64, 2})
 
     if abs(R[1,3]) < eps(Float64) && abs(R[2,3]) < eps(Float64)
@@ -194,6 +211,8 @@ Point2D() = Point2D(0, 0) # canonical point2d
 # sum of Point2d
 +(p1::Point2D, p2::Point2D) = Point2D(p1.x + p2.x, p1.y + p2.y) 
 # mul Array--Point2d
+
+
 function *{T}(A::Array{T,2}, p::Point2D) 
 
    p2 = A * [p.x,p.y,1]
@@ -201,6 +220,7 @@ function *{T}(A::Array{T,2}, p::Point2D)
    return Point2D(p2[1], p2[2])
    
 end
+
 
 @doc """
 
@@ -218,10 +238,13 @@ immutable Point{T<:Real} <: Number
     z::T
 end
 
+
 #*************************************************************************
 # Pose type 
 #*************************************************************************
 # TODO(elsuizo): look what is the better type to hierarchy
+
+
 @doc """
 A frame or Pose is a point with associated orientation
 
@@ -241,6 +264,7 @@ type Pose2D <: Number
         new(p, θ, ξ)
     end
 end
+
 
 Pose2D() = Pose2D(0.0, 0.0, 0.0) # canonical Pose
 #-------------------------------------------------------------------------
