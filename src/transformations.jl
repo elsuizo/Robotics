@@ -184,6 +184,33 @@ function rot2euler(R::Array{Float64, 2})
 end
 
 
+@doc """
+Compute the Rotation matrix from an arbitrary axis and angle.
+
+Inputs:
+------
+
+θ: Angle of rotation(Nuber)
+v: axis of rotation(Array{T, 1} with T any number) 
+
+Output:
+------
+
+R: Rotation matrix(Array{Float64, 2})
+""" ->
+function angle_vector2rot{T<:Number}(θ::Number, v::Array{T, 1})
+
+    cth = cos(θ)
+	sth = sin(θ)
+	vth = (1 - cth)
+	v_x = v[1]; v_y = v[2]; v_z = v[3]
+    R = [
+    v_x*v_x*vth+cth      v_y*v_x*vth-v_z*sth   v_z*v_x*vth+v_y*sth
+    v_x*v_y*vth+v_z*sth   v_y*v_y*vth+cth      v_z*v_y*vth-v_x*sth
+    v_x*v_z*vth-v_y*sth   v_y*v_z*vth+v_x*sth   v_z*v_z*vth+cth
+	];
+    return R
+end
 
 #-------------------------------------------------------------------------
 # Points Types

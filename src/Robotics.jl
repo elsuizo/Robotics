@@ -38,7 +38,18 @@
 
 module Robotics
 
-export Point2D, Pose2D, ⊖, ⊕, rotx, roty, rotz, show, *, euler2rot, rot2euler
+export Point2D, 
+       Pose2D, 
+       ⊖, 
+       ⊕, 
+       rotx, 
+       roty, 
+       rotz, 
+       show, 
+       *, 
+       euler2rot, 
+       rot2euler,
+       angle_vector2rot
 
 include("transformations.jl")
 include("robots_types.jl")
