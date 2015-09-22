@@ -36,13 +36,12 @@
 # Imports
 #*************************************************************************
 import Base: show, *, size, +
-using Docile
+
 #*************************************************************************
 # Rotations
-#*************************************************************************
+#************************************************************************
 
-
-@doc """
+"""
 Compute the rotation around the `x` axis(in cartesian coordinates)
 
 Input:
@@ -59,7 +58,7 @@ example:
 -------
 
 `R = rotx(deg2rad(30)) # rotation around x 30 degrees`
- """ ->
+ """ 
 function rotx(∠::Number)
     
     Rₓ = [1   0       0;
@@ -70,7 +69,7 @@ function rotx(∠::Number)
 end
 
 
-@doc """
+"""
 Compute the rotation around the `y` axis(in cartesian coordinates)
 
 Input:
@@ -87,7 +86,7 @@ example:
 -------
 `R = roty(deg2rad(30)) # rotation around y 30 degrees`
 
- """ ->
+ """
 function roty(∠::Number)
 
     R_y = [cos(∠)  0  sin(∠);
@@ -98,7 +97,7 @@ function roty(∠::Number)
 end
 
 
-@doc """
+"""
 Compute the rotation around the `z` axis(in cartesian coordinates)
 
 Input:
@@ -115,7 +114,7 @@ example:
 -------
 
 `R = rotz(deg2rad(30)) # rotation around z 30 degrees`
-""" ->
+"""
 function rotz(∠::Number)
 
     R_z = [cos(∠)  -sin(∠) 0;
@@ -126,7 +125,7 @@ function rotz(∠::Number)
 end
 
 
-@doc """
+"""
 Compute the rotation Matrix from Euler angles from the convention ZYZ
 
 Inputs:
@@ -139,14 +138,14 @@ Output:
 ------
 
 R: Rotation matrix(3x3 Array{Float64, 2})
-""" ->
+""" 
 function euler2rot(ϕ::Number, θ::Number, ψ::Number)
 
     return R = rotz(ϕ) * roty(θ) * rotz(ψ)
 end
 
 
-@doc """
+"""
 Compute the euler angles from a Rotation matrix(ZYZ convention)
 
 Input:
@@ -161,7 +160,7 @@ Outputs:
 θ: second angle of euler(Number)
 ψ: third angle of euler(Number)
 
-""" ->
+""" 
 function rot2euler(R::Array{Float64, 2})
 
     if abs(R[1,3]) < eps(Float64) && abs(R[2,3]) < eps(Float64)
@@ -184,7 +183,7 @@ function rot2euler(R::Array{Float64, 2})
 end
 
 
-@doc """
+"""
 Compute the Rotation matrix from an arbitrary axis and angle.
 
 Inputs:
@@ -197,7 +196,7 @@ Output:
 ------
 
 R: Rotation matrix(Array{Float64, 2})
-""" ->
+""" 
 function angle_vector2rot{T<:Number}(θ::Number, v::Array{T, 1})
 
     cth = cos(θ)
@@ -215,7 +214,7 @@ end
 #-------------------------------------------------------------------------
 # Points Types
 #-------------------------------------------------------------------------
-@doc """
+"""
 Point2D type container for a cartesian 2D-Point 
 
 example:
@@ -223,7 +222,7 @@ example:
 
 `p = Point2D(1,1) # x=1, y=1`
 
-""" ->
+""" 
 immutable Point2D{T<:Real} <: Number
     x :: T
     y :: T
@@ -249,7 +248,7 @@ function *{T}(A::Array{T,2}, p::Point2D)
 end
 
 
-@doc """
+"""
 
 Point type container for a 3-D cartesian Point representation
 
@@ -258,7 +257,7 @@ example:
 
 `p = Point(1, 1, 1) # x=1, y=1, z=1`
 
-""" ->
+""" 
 immutable Point{T<:Real} <: Number
     x::T
     y::T
@@ -272,7 +271,7 @@ end
 # TODO(elsuizo): look what is the better type to hierarchy
 
 
-@doc """
+"""
 A frame or Pose is a point with associated orientation
 
 """->
