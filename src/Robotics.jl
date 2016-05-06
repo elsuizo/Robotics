@@ -35,32 +35,39 @@
 # 
 # You should have received a copy of the GNU General Public License
 # Code:
+
+# enable precompilation
 __precompile__(true)
 
 module Robotics
 
-import Base: show, *, size, +, ⊕, ⊖
+import Base: show, *, size, +  
 
-
-export Point2D,
-       Pose2D, 
-       ⊖, 
-       ⊕, 
-       rotx,
-       roty,
-       rotz,
-       show,
-       *,
-       euler2rot,
-       rot2euler,
-       angle_vector2rot,
-         rot2trans,
-      trotx
-
+#=------------------------------------------------------------------------------
+                           Includes
+------------------------------------------------------------------------------=#
 include("transformations.jl")
 include("robots_types.jl")
 include("utility.jl")
 include("graphics.jl")
+#=------------------------------------------------------------------------------
+                              Exports 
+------------------------------------------------------------------------------=#
+export   #types
+         Point2D,
+         Pose2D, 
+         #methods
+         rotx,
+         roty,
+         rotz,
+         show,
+         *,
+         euler2rot,
+         rot2euler,
+         angle_vector2rot,
+         rot2trans,
+         trotx
+
 
 end
 # 
