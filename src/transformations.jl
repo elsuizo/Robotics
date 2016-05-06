@@ -35,7 +35,6 @@
 #*************************************************************************
 # Imports
 #*************************************************************************
-import Base: show, *, size, +
 
 #*************************************************************************
 # Rotations
@@ -122,6 +121,37 @@ function rotz(∠::Number)
             0          0   1]
 
     return R_z
+end
+
+"""
+Rotatation about x axis
+"""
+function trotx(∠::Number)
+   return rot2trans(rotx(∠))
+end
+
+"""
+Rotatation about y axis
+"""
+function troty(∠::Number)
+   return rot2trans(roty(∠))
+end
+
+"""
+Rotatation about z axis
+"""
+function trotz(∠::Number)
+   return rot2trans(rotz(∠))
+end
+
+"""
+Convert a 3x3 Rotation matrix to a 4x4 homogeneous transformation
+"""
+function rot2trans(R::Array{Float64, 2})
+  x = [0 ,0, 0, 1] 
+  v = [0, 0, 1]
+  R = vcat(R, v')
+  return hcat(R, x)
 end
 
 
