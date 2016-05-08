@@ -176,6 +176,28 @@ end
 
 
 """
+Compute the rotation Matrix from Euler angles from the convention ZYZ
+
+Input:
+------
+vec: Vector with the euler angles([ϕ, θ, ψ])
+
+Output:
+------
+
+R: Rotation matrix(3x3 Array{Float64, 2})
+
+"""
+function euler2rot(vec::Array{Number,1})
+   l = length(vec)
+   if l != 3
+      error("The length of the vector must be 3")
+   end
+   return R = rotz(vec[1]) * roty(vec[2]) * rotz(vec[3])
+end
+
+   
+"""
 Compute the euler angles from a Rotation matrix(ZYZ convention)
 
 Input:
@@ -212,7 +234,22 @@ function rot2euler(R::Array{Float64, 2})
     return ϕ, θ, ψ
 end
 
+"""
+Compute the Rotation from Euler angles
 
+Inputs:
+------
+ϕ: first angle of euler(Number)
+θ: second angle of euler(Number)
+ψ: third angle of euler(Number)
+
+Output:
+------
+
+R: Rotation homogeneous matrix(4x4 Array{Float64, 2})
+""" 
+function euler2trans(ϕ, θ, ψ)
+   return rot2trans(euler2rot(ϕ, θ, ψ))
 """
 Compute the Rotation matrix from an arbitrary axis and angle.
 
