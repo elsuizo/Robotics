@@ -1,36 +1,35 @@
-# transformations.jl --- 
-# 
+# transformations.jl
+#
 # Filename: transformations.jl
 # Description: Main transformation operations for robotics stuff
 # Author: Martin Noblía
-# Maintainer: 
+# Maintainer:
 # Created: mié may  6 21:53:51 2015 (-0300)
 # Version: 0.0.1
 # Package-Requires: ()
-# Last-Updated: 
-#           By: 
+# Last-Updated:
+#           By:
 #     Update #: 0
 
-# Commentary: 
-# 
-# 
-# 
-# 
-# 
+# Commentary:
+#
+#
+#
+#
+#
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or (at
 # your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful, but
 # WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
-# 
-# 
-
+#
+#
 # Code:
 #*************************************************************************
 # Imports
@@ -57,14 +56,13 @@ example:
 -------
 
 `R = rotx(deg2rad(30)) # rotation around x 30 degrees`
- """ 
+ """
 function rotx(∠::Number)
-    
-    Rₓ = [1   0       0;
-          0 cos(∠) -sin(∠);
-          0 sin(∠) cos(∠)]
+   Rₓ = [1   0       0;
+       0 cos(∠) -sin(∠);
+       0 sin(∠) cos(∠)]
 
-    return Rₓ
+   return Rₓ
 end
 
 
@@ -148,7 +146,7 @@ end
 Convert a 3x3 Rotation matrix to a 4x4 homogeneous transformation
 """
 function rot2trans(R::Array{Float64, 2})
-  x = [0 ,0, 0, 1] 
+  x = [0 ,0, 0, 1]
   v = [0, 0, 1]
   R = vcat(R, v')
   return hcat(R, x)
@@ -250,6 +248,7 @@ R: Rotation homogeneous matrix(4x4 Array{Float64, 2})
 """ 
 function euler2trans(ϕ, θ, ψ)
    return rot2trans(euler2rot(ϕ, θ, ψ))
+end
 """
 Compute the Rotation matrix from an arbitrary axis and angle.
 
@@ -266,15 +265,15 @@ R: Rotation matrix(Array{Float64, 2})
 """ 
 function angle_vector2rot{T<:Number}(θ::Number, v::Array{T, 1})
 
-    cth = cos(θ)
-	sth = sin(θ)
-	vth = (1 - cth)
+   cth = cos(θ)
+   sth = sin(θ)
+   vth = (1 - cth)
 	v_x = v[1]; v_y = v[2]; v_z = v[3]
-    R = [
-    v_x*v_x*vth+cth      v_y*v_x*vth-v_z*sth   v_z*v_x*vth+v_y*sth
-    v_x*v_y*vth+v_z*sth   v_y*v_y*vth+cth      v_z*v_y*vth-v_x*sth
-    v_x*v_z*vth-v_y*sth   v_y*v_z*vth+v_x*sth   v_z*v_z*vth+cth
-	];
+   R = [
+      v_x*v_x*vth+cth      v_y*v_x*vth-v_z*sth   v_z*v_x*vth+v_y*sth
+      v_x*v_y*vth+v_z*sth   v_y*v_y*vth+cth      v_z*v_y*vth-v_x*sth
+      v_x*v_z*vth-v_y*sth   v_y*v_z*vth+v_x*sth   v_z*v_z*vth+cth
+   ];
     return R
 end
 
@@ -282,14 +281,14 @@ end
 # Points Types
 #-------------------------------------------------------------------------
 """
-Point2D type container for a cartesian 2D-Point 
+Point2D type container for a cartesian 2D-Point
 
 example:
 -------
 
 `p = Point2D(1,1) # x=1, y=1`
 
-""" 
+"""
 immutable Point2D{T<:Real} <: Number
     x :: T
     y :: T
@@ -302,16 +301,16 @@ Point2D(x::Real, y::Real) = Point2D(promote(x, y)...)
 
 Point2D() = Point2D(0, 0) # canonical point2d
 # sum of Point2d
-+(p1::Point2D, p2::Point2D) = Point2D(p1.x + p2.x, p1.y + p2.y) 
++(p1::Point2D, p2::Point2D) = Point2D(p1.x + p2.x, p1.y + p2.y)
 # mul Array--Point2d
 
 
-function *{T}(A::Array{T,2}, p::Point2D) 
+function *{T}(A::Array{T,2}, p::Point2D)
 
    p2 = A * [p.x,p.y,1]
-   
+
    return Point2D(p2[1], p2[2])
-   
+
 end
 
 
@@ -332,9 +331,9 @@ immutable Point{T<:Real} <: Number
 end
 
 
-#*************************************************************************
+#-------------------------------------------------------------------------
 # Pose type 
-#*************************************************************************
+#-------------------------------------------------------------------------
 # TODO(elsuizo): look what is the better type to hierarchy
 
 
@@ -346,14 +345,15 @@ type Pose2D <: Number
     p::Point2D
     θ::Real
     ξ::Array{Float64, 2}
-    
+
     function Pose2D(x::Real, y::Real, θ::Real)
-        p = Point2D(x, y) 
-        ξ = [cos(θ) -sin(θ) p.x;sin(θ) cos(θ) p.y;0.0 0.0 1.0]
+        p = Point2D(x, y)
+        ξ = [cos(θ) -sin(θ) p.x;sin(θ) cos(θ) p.y; 0.0 0.0 1.0]
         new(p, θ, ξ)
     end
+
     function Pose2D(p::Point2D, θ::Real)
-        ξ = [cos(θ) -sin(θ) p.x;sin(θ) cos(θ) p.y;0.0 0.0 1.0]
+        ξ = [cos(θ) -sin(θ) p.x;sin(θ) cos(θ) p.y; 0.0 0.0 1.0]
         new(p, θ, ξ)
     end
 end
@@ -361,14 +361,14 @@ end
 
 Pose2D() = Pose2D(0.0, 0.0, 0.0) # canonical Pose
 #-------------------------------------------------------------------------
-# Show 
+# Show
 #-------------------------------------------------------------------------
 function show(io::IO, p::Pose2D)
     print(io,p.ξ)
 end
 
 #-------------------------------------------------------------------------
-# Size of 
+# Size of
 #-------------------------------------------------------------------------
 size(p::Pose2D) = size(p.ξ)
 
@@ -379,26 +379,31 @@ size(p::Pose2D) = size(p.ξ)
 #-------------------------------------------------------------------------
 # Inverse
 #-------------------------------------------------------------------------
-function ⊖(p::Pose2D) 
-    
+function ⊖(p::Pose2D)::Pose2D
+
     p.ξ[1:2,1:2] = p.ξ[1:2,1:2]'
-    
+
     p.ξ[1:2,3] = -p.ξ[1:2,1:2] * p.ξ[1:2,3]
-    
+
     return p
 end
 #-------------------------------------------------------------------------
 # Product
 #-------------------------------------------------------------------------
-function ⊕(p1::Pose2D, p2::Pose2D)
+function ⊕(p1::Pose2D, p2::Pose2D)::Pose2D
     p3 = Pose2D() # Pose type
-    p3.ξ = p1.ξ * p2.ξ 
-    p3.p = p1.p + p1.ξ * p2.p 
+    p3.ξ = p1.ξ * p2.ξ
+    p3.p = p1.p + p1.ξ * p2.p
     p3.θ = p1.θ + p2.θ
     return p3
 end
 
-function *(p1::Pose2D, p::Point2D)
+function *(p::Point2D, p1::Pose2D)::Point2D
+   p2 = p1.ξ * [p.x, p.y, 1]
+   return Point2D(p2[1], p2[2])
+end
+
+function *(p1::Pose2D, p::Point2D)::Point2D
    p2 = p1.ξ * [p.x, p.y, 1]
    return Point2D(p2[1], p2[2])
 end
@@ -409,4 +414,4 @@ function *{T}(p1::Pose2D, p::Array{T, 2})
 end
 
 # transformations.jl ends here
-#**************************************************************************
+#--------------------------------------------------------------------------
