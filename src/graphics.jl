@@ -35,7 +35,31 @@
 # Code:
 using PyPlot
 
+colors = Dict(
+               "red"    =>  "r",
+               "blue"   =>  "b",
+               "black"  =>  "k",
+             )
 
+function plot_frame(p::Pose2D, color="black")
+
+   plt[:figure]()
+   ax = plt[:gca]()
+
+   #ax[:arrow](x,y,dx,dy, fc="k", ec="k", head_width=0.1, head_length=0.1 )
+   ax[:arrow](p.p.x, p.p.y, p.ξ[1,1], p.ξ[2,1], fc=colors[color], ec=colors[color], head_width=0.1, head_length=0.1)
+   ax[:arrow](p.p.x, p.p.y, p.ξ[1,2], p.ξ[2,2], fc=colors[color], ec=colors[color], head_width=0.1, head_length=0.1)
+
+   # TODO(elsuizo): ver para que quede centrado alrededor del punto p con un offset
+   ax[:set_xlim]([-5 - p.p.x, 5 + p.p.x])
+   xlabel(L"x")
+   ax[:set_ylim]([-5 - p.p.x, 5 + p.p.x])
+   ylabel(L"y")
+
+   title("Frame plot")
+   plt[:draw]()
+   plt[:show]()
+end
 
 #
 # graphics.jl ends here
