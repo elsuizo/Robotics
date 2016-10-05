@@ -61,14 +61,13 @@ export   #types
          roty,
          rotz,
          show,
-         *,
          euler2rot,
          rot2euler,
          angle_vector2rot,
          rot2trans,
-         trotx
-
-
+         trotx,
+         # graphics
+         plot_frame
 end
 # 
 # Robotics.jl ends here
