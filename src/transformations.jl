@@ -340,7 +340,7 @@ end
 A frame or Pose is a point with associated orientation
 
 """
-type Pose2D <: Number
+immutable Pose2D <: Number
    p::Point2D
    θ::Real
    ξ::Array{Float64, 2}
