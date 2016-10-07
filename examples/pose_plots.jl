@@ -26,5 +26,5 @@
 using Robotics
 # generate 50 random Pose2D in [-3,3]
 v = generate_random_pose(50, -3:3)
-# plot all Pose2D
+# plot all Pose2D in one figure
 plot_frame(v)
