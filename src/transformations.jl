@@ -24,10 +24,14 @@
 ---------------------------------------------------------------------------=#
 # NOTE(elsuizo:2019-04-09): usamos esto por performance ya que sabemos de antemano el size de los arrays
 #=------------------------------------------------------------------------------
-                           imports
+imports
 ------------------------------------------------------------------------------=#
 using StaticArrays
 using LinearAlgebra
+
+#=------------------------------------------------------------------------------
+code
+------------------------------------------------------------------------------=#
 """
 Compute the rotation around the `x` axis(in cartesian coordinates)
 
@@ -45,8 +49,8 @@ example:
 -------
 
 `R = rotx(deg2rad(30)) # rotation around x 30 degrees`
- """
-function rotx(∠::Number)
+"""
+function rotx(∠::Real)
    Rₓ = @SMatrix [1.0   0.0       0.0;
                   0.0  cos(∠)   -sin(∠);
                   0.0  sin(∠)   cos(∠)]
@@ -72,14 +76,14 @@ example:
 -------
 `R = roty(deg2rad(30)) # rotation around y 30 degrees`
 
- """
-function roty(∠::Number)
+"""
+function roty(∠::Real)
 
-    R_y = @SMatrix [cos(∠)  0.0  sin(∠);
-                     0.0    1.0     0.0;
-                  -sin(∠)   0.0  cos(∠)]
+   R_y = @SMatrix [cos(∠)  0.0  sin(∠);
+                   0.0    1.0     0.0;
+                   -sin(∠)   0.0  cos(∠)]
 
-    return R_y
+   return R_y
 end
 
 
@@ -101,44 +105,44 @@ example:
 
 `R = rotz(deg2rad(30)) # rotation around z 30 degrees`
 """
-function rotz(∠::Number)
+function rotz(∠::Real)
 
-    R_z = @SMatrix [cos(∠)  -sin(∠) 0.0;
-                    sin(∠)   cos(∠) 0.0;
-                     0.0       0.0  1.0]
+   R_z = @SMatrix [cos(∠)  -sin(∠) 0.0;
+                   sin(∠)   cos(∠) 0.0;
+                   0.0       0.0  1.0]
 
-    return R_z
+   return R_z
 end
 
 """
 Rotatation about x axis
 """
-function trotx(∠::Number)
+function trotx(∠::Real)
    return rot2trans(rotx(∠))
 end
 
 """
 Rotatation about y axis
 """
-function troty(∠::Number)
+function troty(∠::Real)
    return rot2trans(roty(∠))
 end
 
 """
 Rotatation about z axis
 """
-function trotz(∠::Number)
+function trotz(∠::Real)
    return rot2trans(rotz(∠))
 end
 
 """
 Convert a 3x3 Rotation matrix to a 4x4 homogeneous transformation
 """
-function rot2trans(R::Array{Float64, 2})
-  x = @SVector [0 ,0, 0, 1]
-  v = @SVector [0, 0, 1]
-  R = @SMatrix vcat(R, v')
-  return @SMatrix hcat(R, x)
+function rot2trans(r::AbstractArray{Float64, 2})
+   R = @MArray zeros(4,4)
+   R[:, end] = [0.0, 0.0, 0.0, 1.0]
+   R[1:3, 1:3] = r
+   return R
 end
 
 
@@ -156,7 +160,7 @@ Output:
 
 R: Rotation matrix(3x3 Array{Float64, 2})
 """
-function euler2rot(ϕ::Number, θ::Number, ψ::Number)
+function euler2rot(ϕ::Real, θ::Real, ψ::Real)
 
     return R = rotz(ϕ) * roty(θ) * rotz(ψ)
 end
@@ -175,7 +179,7 @@ Output:
 R: Rotation matrix(3x3 Array{Float64, 2})
 
 """
-function euler2rot(vec::Array{Number,1})
+function euler2rot(vec::Array{T,1}) where T<:Real
    l = length(vec)
    if l != 3
       error("The length of the vector must be 3")
@@ -199,22 +203,22 @@ Outputs:
 ψ: third angle of euler(Number)
 
 """
-function rot2euler(R::Array{Float64, 2})
+function rot2euler(R::AbstractArray{T, 2}) where T<:Real
 
     if abs(R[1,3]) < eps(Float64) && abs(R[2,3]) < eps(Float64)
         # singularity
         ϕ = 0.0
         sp = 0.0
         cp = 1.0
-        θ = atan2(cp * R[1, 3] + sp * R[2, 3], R[3, 3])
-        ψ = atan2(-sp * R[1, 1] + cp * R[2, 1], -sp * R[1, 2] + cp * R[2, 2])
+        θ = atand(cp * R[1, 3] + sp * R[2, 3], R[3, 3])
+        ψ = atand(-sp * R[1, 1] + cp * R[2, 1], -sp * R[1, 2] + cp * R[2, 2])
     else
         # non-singular
-        ϕ = atan2(R[2, 3], R[1, 3])
+        ϕ = atand(R[2, 3], R[1, 3])
         sp = sin(ϕ)
         cp = cos(ϕ)
-        θ = atan2(cp * R[1, 3] + sp * R[2, 3], R[3, 3])
-        ψ = atan2(-sp * R[1, 1] + cp * R[2, 1], -sp * R[1, 2] + cp * R[2, 2])
+        θ = atand(cp * R[1, 3] + sp * R[2, 3], R[3, 3])
+        ψ = atand(-sp * R[1, 1] + cp * R[2, 1], -sp * R[1, 2] + cp * R[2, 2])
     end
 
     return ϕ, θ, ψ
@@ -237,21 +241,22 @@ R: Rotation homogeneous matrix(4x4 Array{Float64, 2})
 function euler2trans(ϕ, θ, ψ)
    return rot2trans(euler2rot(ϕ, θ, ψ))
 end
+
 """
 Compute the Rotation matrix from an arbitrary axis and angle.
 
 Inputs:
 ------
 
-θ: Angle of rotation(Nuber)
-v: axis of rotation(Array{T, 1} with T any number)
+θ: Angle of rotation(any Real number)
+v: axis of rotation(Array{T, 1} with T any Real number)
 
 Output:
 ------
 
-R: Rotation matrix(Array{Float64, 2})
+R: Rotation matrix(AbstractArray{T, 2})
 """
-function angle_vector2rot{T<:Number}(θ::Number, v::Array{T, 1})
+function angle_vector2rot(θ::T, v::AbstractArray{T, 1}) where T<:Real
 
    cth = cos(θ)
    sth = sin(θ)
@@ -265,143 +270,140 @@ function angle_vector2rot{T<:Number}(θ::Number, v::Array{T, 1})
     return R
 end
 
-#
-# #-------------------------------------------------------------------------
-# # Points Types
-# #-------------------------------------------------------------------------
-# """
-# Point2D type container for a cartesian 2D-Point
-#
-# example:
-# -------
-#
-# `p = Point2D(1,1) # x=1, y=1`
-#
-# """
-# immutable Point2D{T<:Real} <: Number
-#    x :: T
-#    y :: T
-# end
-# #-------------------------------------------------------------------------
-# # maths Point2d
-# #-------------------------------------------------------------------------
-# # promote Point2d
-# Point2D(x::Real, y::Real) = Point2D(promote(x, y)...)
-#
-# Point2D() = Point2D(0, 0) # canonical point2d
-# # sum of Point2d
-# +(p1::Point2D, p2::Point2D) = Point2D(p1.x + p2.x, p1.y + p2.y)
-# # mul Array--Point2d
-#
-#
-# function *{T}(A::Array{T,2}, p::Point2D)
-#
-#    p2 = A * [p.x,p.y,1]
-#
-#    return Point2D(p2[1], p2[2])
-#
-# end
-#
-#
-# """
-#
-# Point type container for a 3-D cartesian Point representation
-#
-# example:
-# -------
-#
-# `p = Point(1, 1, 1) # x=1, y=1, z=1`
-#
-# """
-# immutable Point{T<:Real} <: Number
-#    x::T
-#    y::T
-#    z::T
-# end
-#
-#
-# #-------------------------------------------------------------------------
-# # Pose type
-# #-------------------------------------------------------------------------
-# # TODO(elsuizo): look what is the better type to hierarchy
-#
-#
-# """
-# A frame or Pose is a point with associated orientation
-#
-# """
-# immutable Pose2D <: Number
-#    p::Point2D
-#    θ::Real
-#    ξ::Array{Float64, 2}
-#
-#    function Pose2D(x::Real, y::Real, θ::Real)
-#       p = Point2D(x, y)
-#       ξ = [cos(θ) -sin(θ) p.x;sin(θ) cos(θ) p.y; 0.0 0.0 1.0]
-#       new(p, θ, ξ)
-#    end
-#
-#    function Pose2D(p::Point2D, θ::Real)
-#       ξ = [cos(θ) -sin(θ) p.x;sin(θ) cos(θ) p.y; 0.0 0.0 1.0]
-#       new(p, θ, ξ)
-#    end
-# end
-#
-#
-# Pose2D() = Pose2D(0.0, 0.0, 0.0) # canonical Pose
-# #-------------------------------------------------------------------------
-# # Show
-# #-------------------------------------------------------------------------
-# function show(io::IO, p::Pose2D)
-#    print(io,p.ξ)
-# end
-#
-# #-------------------------------------------------------------------------
-# # Size of
-# #-------------------------------------------------------------------------
-# size(p::Pose2D) = size(p.ξ)
-#
-# #-------------------------------------------------------------------------
-# # Maths with Pose
-# #-------------------------------------------------------------------------
-#
-# #-------------------------------------------------------------------------
-# # Inverse
-# #-------------------------------------------------------------------------
-# function ⊖(p::Pose2D)::Pose2D
-#
-#    p.ξ[1:2,1:2] = p.ξ[1:2,1:2]'
-#
-#    p.ξ[1:2,3] = -p.ξ[1:2,1:2] * p.ξ[1:2,3]
-#
-#    return p
-# end
-# #-------------------------------------------------------------------------
-# # Product
-# #-------------------------------------------------------------------------
-# function ⊕(p1::Pose2D, p2::Pose2D)::Pose2D
-#    p3 = Pose2D() # Pose type
-#    p3.ξ = p1.ξ * p2.ξ
-#    p3.p = p1.p + p1.ξ * p2.p
-#    p3.θ = p1.θ + p2.θ
-#    return p3
-# end
-#
-# function *(p::Point2D, p1::Pose2D)::Point2D
-#    p2 = p1.ξ * [p.x, p.y, 1]
-#    return Point2D(p2[1], p2[2])
-# end
-#
-# function *(p1::Pose2D, p::Point2D)::Point2D
-#    p2 = p1.ξ * [p.x, p.y, 1]
-#    return Point2D(p2[1], p2[2])
-# end
-#
-# function *{T}(p1::Pose2D, p::Array{T, 2})
-#    p2 = p1.ξ * p
-#    return Point2D(p2[1], p2[2])
-# end
-#
-# # transformations.jl ends here
-# #--------------------------------------------------------------------------
-
+# #
+# # #-------------------------------------------------------------------------
+# # # Points Types
+# # #-------------------------------------------------------------------------
+# # """
+# # Point2D type container for a cartesian 2D-Point
+# #
+# # example:
+# # -------
+# #
+# # `p = Point2D(1,1) # x=1, y=1`
+# #
+# # """
+# # immutable Point2D{T<:Real} <: Number
+# #    x :: T
+# #    y :: T
+# # end
+# # #-------------------------------------------------------------------------
+# # # maths Point2d
+# # #-------------------------------------------------------------------------
+# # # promote Point2d
+# # Point2D(x::Real, y::Real) = Point2D(promote(x, y)...)
+# #
+# # Point2D() = Point2D(0, 0) # canonical point2d
+# # # sum of Point2d
+# # +(p1::Point2D, p2::Point2D) = Point2D(p1.x + p2.x, p1.y + p2.y)
+# # # mul Array--Point2d
+# #
+# #
+# # function *{T}(A::Array{T,2}, p::Point2D)
+# #
+# #    p2 = A * [p.x,p.y,1]
+# #
+# #    return Point2D(p2[1], p2[2])
+# #
+# # end
+# #
+# #
+# # """
+# #
+# # Point type container for a 3-D cartesian Point representation
+# #
+# # example:
+# # -------
+# #
+# # `p = Point(1, 1, 1) # x=1, y=1, z=1`
+# #
+# # """
+# # immutable Point{T<:Real} <: Number
+# #    x::T
+# #    y::T
+# #    z::T
+# # end
+# #
+# #
+# # #-------------------------------------------------------------------------
+# # # Pose type
+# # #-------------------------------------------------------------------------
+# # # TODO(elsuizo): look what is the better type to hierarchy
+# #
+# #
+# # """
+# # A frame or Pose is a point with associated orientation
+# #
+# # """
+# # immutable Pose2D <: Number
+# #    p::Point2D
+# #    θ::Real
+# #    ξ::Array{Float64, 2}
+# #
+# #    function Pose2D(x::Real, y::Real, θ::Real)
+# #       p = Point2D(x, y)
+# #       ξ = [cos(θ) -sin(θ) p.x;sin(θ) cos(θ) p.y; 0.0 0.0 1.0]
+# #       new(p, θ, ξ)
+# #    end
+# #
+# #    function Pose2D(p::Point2D, θ::Real)
+# #       ξ = [cos(θ) -sin(θ) p.x;sin(θ) cos(θ) p.y; 0.0 0.0 1.0]
+# #       new(p, θ, ξ)
+# #    end
+# # end
+# #
+# #
+# # Pose2D() = Pose2D(0.0, 0.0, 0.0) # canonical Pose
+# # #-------------------------------------------------------------------------
+# # # Show
+# # #-------------------------------------------------------------------------
+# # function show(io::IO, p::Pose2D)
+# #    print(io,p.ξ)
+# # end
+# #
+# # #-------------------------------------------------------------------------
+# # # Size of
+# # #-------------------------------------------------------------------------
+# # size(p::Pose2D) = size(p.ξ)
+# #
+# # #-------------------------------------------------------------------------
+# # # Maths with Pose
+# # #-------------------------------------------------------------------------
+# #
+# # #-------------------------------------------------------------------------
+# # # Inverse
+# # #-------------------------------------------------------------------------
+# # function ⊖(p::Pose2D)::Pose2D
+# #
+# #    p.ξ[1:2,1:2] = p.ξ[1:2,1:2]'
+# #
+# #    p.ξ[1:2,3] = -p.ξ[1:2,1:2] * p.ξ[1:2,3]
+# #
+# #    return p
+# # end
+# # #-------------------------------------------------------------------------
+# # # Product
+# # #-------------------------------------------------------------------------
+# # function ⊕(p1::Pose2D, p2::Pose2D)::Pose2D
+# #    p3 = Pose2D() # Pose type
+# #    p3.ξ = p1.ξ * p2.ξ
+# #    p3.p = p1.p + p1.ξ * p2.p
+# #    p3.θ = p1.θ + p2.θ
+# #    return p3
+# # end
+# #
+# # function *(p::Point2D, p1::Pose2D)::Point2D
+# #    p2 = p1.ξ * [p.x, p.y, 1]
+# #    return Point2D(p2[1], p2[2])
+# # end
+# #
+# # function *(p1::Pose2D, p::Point2D)::Point2D
+# #    p2 = p1.ξ * [p.x, p.y, 1]
+# #    return Point2D(p2[1], p2[2])
+# # end
+# #
+# # function *{T}(p1::Pose2D, p::Array{T, 2})
+# #    p2 = p1.ξ * p
+# #    return Point2D(p2[1], p2[2])
+# # end
+# #
