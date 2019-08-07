@@ -24,11 +24,27 @@
 
 ---------------------------------------------------------------------------=#
 # testing
-using Robotics
+using Robotics, LinearAlgebra
+# NOTE(elsuizo:2019-08-07): no usar == cuando se comparan Floats
 @testset "transformations" begin
-   R1 = rotx(deg2rad(30))
-   R2 = rotx(deg2rad(30 + 360))
-   @test R1 == R2
+   @testset "rotx" begin
+      R1 = rotx(deg2rad(30))
+      R2 = rotx(deg2rad(30 + 360))
+      @test R1 ≈ R2
+      @test det(R1) ≈ det(R2) ≈ 1.0
+   end
+   @testset "roty" begin
+      R3 = roty(deg2rad(30))
+      R4 = roty(deg2rad(30 + 360))
+      @test R3 ≈ R4
+      @test det(R3) ≈ det(R4) ≈ 1.0
+   end
+   @testset "rotz" begin
+      R5 = rotz(deg2rad(30))
+      R6 = rotz(deg2rad(30 + 360))
+      @test R5 ≈ R6
+      @test det(R5) ≈ det(R6) ≈ 1.0
+   end
 end
 
 
