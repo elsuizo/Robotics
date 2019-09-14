@@ -12,12 +12,13 @@ include("transformations.jl")
 include("robots_types.jl")
 include("utility.jl")
 include("graphics.jl")
+include("types.jl")
 #=------------------------------------------------------------------------------
                               Exports
 ------------------------------------------------------------------------------=#
 export   #types
-         Point2D,
-         Pose2D,
+         Point2D, # TODO(elsuizo:2019-09-04): proximamente
+         Pose2D,  # TODO(elsuizo:2019-09-04): proximamente
          #methods
          rotx,
          roty,
