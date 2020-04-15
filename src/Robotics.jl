@@ -30,6 +30,7 @@ export   #types
          rot2trans,
          trotx,
          skew,
+         skewa,
          # graphics
          plot_frame,
          # utility

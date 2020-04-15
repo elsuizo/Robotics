@@ -140,7 +140,7 @@ end
 Convert a 3x3 Rotation matrix to a 4x4 homogeneous transformation
 """
 function rot2trans(r::AbstractArray{Float64, 2})
-   R = @MArray zeros(4,4)
+   R = @SMatrix zeros(4,4)
    R[:, end] = [0.0, 0.0, 0.0, 1.0]
    R[1:3, 1:3] = r
    return R
@@ -263,12 +263,11 @@ function angle_vector2rot(θ::T, v::AbstractArray{T, 1}) where T<:Real
    sth = sin(θ)
    vth = (1 - cth)
    v_x = v[1]; v_y = v[2]; v_z = v[3]
-   R = [
+   @SMatrix [
       v_x*v_x*vth+cth      v_y*v_x*vth-v_z*sth   v_z*v_x*vth+v_y*sth
       v_x*v_y*vth+v_z*sth   v_y*v_y*vth+cth      v_z*v_y*vth-v_x*sth
       v_x*v_z*vth-v_y*sth   v_y*v_z*vth+v_x*sth   v_z*v_z*vth+cth
-   ];
-    return R
+   ]
 end
 
 function skew(number:: T) where T<:Real
@@ -276,13 +275,18 @@ function skew(number:: T) where T<:Real
    @SMatrix [z -number; number z]
 end
 
-function skew(v::AbstractArray{T}) where T<:Real
+function skew(v::Vector{T}) where T<:Real
+   # checking the imput
+   l = length(v)
+   l == 3 || throw(DimensionMismatch("the vector must be of length 3 or scalar"))
+   # for type-stability
    z = zero(T)
    @SMatrix [  z   -v[3]  v[2];
              v[3]    z   -v[1];
             -v[2]   v[1]   z  ]
 end
 
+# TODO(elsuizo): no anda bien asi por los StaticArrays
 """
 Compute the augmented skew-symmetric matrix from a vector `v`
 
@@ -297,12 +301,20 @@ Output:
 R: AbstractArray{T}
 """
 function skewa(v::Vector{T}) where T<:Real
-   z = zero(T)
+   # checking the imput
    l = length(v)
    l == 3 || l == 6 || throw(DimensionMismatch("the vector must be of 3 or 6 elements"))
+   # for type-stability
+   z = zero(T)
+   z = Scalar(z)
    if l == 3
-      @SMatrix [skew(v[3]) v[1:2]; z z z]
+      # @SMatrix [skew(v[3]) v[1:2]; z z z]
+      [skew(v[3]) v[1:2]; z z z]
    elseif l == 6
-      @SMatrix [skew(v[4:6]) v[1:3]; z z z z]
+      a = skew(v(4:6))
+      b = @SVector v[1:3]
+      result = @SMatrix zeros(4,4)
+      result[a b; z z z z]
+      # [skew(v[4:6]) v[1:3]; z z z z]
    end
 end
