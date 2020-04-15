@@ -32,6 +32,7 @@ using LinearAlgebra
 #=------------------------------------------------------------------------------
 code
 ------------------------------------------------------------------------------=#
+
 """
 Compute the rotation around the `x` axis(in cartesian coordinates)
 
@@ -50,10 +51,10 @@ example:
 
 `R = rotx(deg2rad(30)) # rotation around x 30 degrees`
 """
-function rotx(∠::Real)
+function rotx(θ::Real)
    Rₓ = @SMatrix [1.0   0.0       0.0;
-                  0.0  cos(∠)   -sin(∠);
-                  0.0  sin(∠)   cos(∠)]
+                  0.0  cos(θ) -sin(θ);
+                  0.0  sin(θ)   cos(θ)]
 
    return Rₓ
 end
@@ -70,18 +71,18 @@ Input:
 Output:
 ------
 
-R_y: Rotation matrix of angle Input
+R_y: Rotation matrix of angle input
 
 example:
 -------
 `R = roty(deg2rad(30)) # rotation around y 30 degrees`
 
 """
-function roty(∠::Real)
+function roty(θ::Real)
 
-   R_y = @SMatrix [cos(∠)  0.0  sin(∠);
-                   0.0    1.0     0.0;
-                   -sin(∠)   0.0  cos(∠)]
+   R_y = @SMatrix [cos(θ)  0.0  sin(θ);
+                    0.0    1.0     0.0;
+                  -sin(θ)  0.0  cos(θ)]
 
    return R_y
 end
@@ -105,11 +106,11 @@ example:
 
 `R = rotz(deg2rad(30)) # rotation around z 30 degrees`
 """
-function rotz(∠::Real)
+function rotz(θ::Real, type_of_angle::Symbol=:deg)
 
-   R_z = @SMatrix [cos(∠)  -sin(∠) 0.0;
-                   sin(∠)   cos(∠) 0.0;
-                   0.0       0.0  1.0]
+   R_z = @SMatrix [cos(θ)  -sin(θ) 0.0;
+                   sin(θ)   cos(θ) 0.0;
+                    0.0       0.0  1.0]
 
    return R_z
 end
@@ -117,22 +118,22 @@ end
 """
 Rotatation about x axis
 """
-function trotx(∠::Real)
-   return rot2trans(rotx(∠))
+function trotx(θ::Real)
+   return rot2trans(rotx(θ))
 end
 
 """
 Rotatation about y axis
 """
-function troty(∠::Real)
-   return rot2trans(roty(∠))
+function troty(θ::Real)
+   return rot2trans(roty(θ))
 end
 
 """
 Rotatation about z axis
 """
-function trotz(∠::Real)
-   return rot2trans(rotz(∠))
+function trotz(θ::Real)
+   return rot2trans(rotz(θ))
 end
 
 """
@@ -270,140 +271,38 @@ function angle_vector2rot(θ::T, v::AbstractArray{T, 1}) where T<:Real
     return R
 end
 
-# #
-# # #-------------------------------------------------------------------------
-# # # Points Types
-# # #-------------------------------------------------------------------------
-# # """
-# # Point2D type container for a cartesian 2D-Point
-# #
-# # example:
-# # -------
-# #
-# # `p = Point2D(1,1) # x=1, y=1`
-# #
-# # """
-# # immutable Point2D{T<:Real} <: Number
-# #    x :: T
-# #    y :: T
-# # end
-# # #-------------------------------------------------------------------------
-# # # maths Point2d
-# # #-------------------------------------------------------------------------
-# # # promote Point2d
-# # Point2D(x::Real, y::Real) = Point2D(promote(x, y)...)
-# #
-# # Point2D() = Point2D(0, 0) # canonical point2d
-# # # sum of Point2d
-# # +(p1::Point2D, p2::Point2D) = Point2D(p1.x + p2.x, p1.y + p2.y)
-# # # mul Array--Point2d
-# #
-# #
-# # function *{T}(A::Array{T,2}, p::Point2D)
-# #
-# #    p2 = A * [p.x,p.y,1]
-# #
-# #    return Point2D(p2[1], p2[2])
-# #
-# # end
-# #
-# #
-# # """
-# #
-# # Point type container for a 3-D cartesian Point representation
-# #
-# # example:
-# # -------
-# #
-# # `p = Point(1, 1, 1) # x=1, y=1, z=1`
-# #
-# # """
-# # immutable Point{T<:Real} <: Number
-# #    x::T
-# #    y::T
-# #    z::T
-# # end
-# #
-# #
-# # #-------------------------------------------------------------------------
-# # # Pose type
-# # #-------------------------------------------------------------------------
-# # # TODO(elsuizo): look what is the better type to hierarchy
-# #
-# #
-# # """
-# # A frame or Pose is a point with associated orientation
-# #
-# # """
-# # immutable Pose2D <: Number
-# #    p::Point2D
-# #    θ::Real
-# #    ξ::Array{Float64, 2}
-# #
-# #    function Pose2D(x::Real, y::Real, θ::Real)
-# #       p = Point2D(x, y)
-# #       ξ = [cos(θ) -sin(θ) p.x;sin(θ) cos(θ) p.y; 0.0 0.0 1.0]
-# #       new(p, θ, ξ)
-# #    end
-# #
-# #    function Pose2D(p::Point2D, θ::Real)
-# #       ξ = [cos(θ) -sin(θ) p.x;sin(θ) cos(θ) p.y; 0.0 0.0 1.0]
-# #       new(p, θ, ξ)
-# #    end
-# # end
-# #
-# #
-# # Pose2D() = Pose2D(0.0, 0.0, 0.0) # canonical Pose
-# # #-------------------------------------------------------------------------
-# # # Show
-# # #-------------------------------------------------------------------------
-# # function show(io::IO, p::Pose2D)
-# #    print(io,p.ξ)
-# # end
-# #
-# # #-------------------------------------------------------------------------
-# # # Size of
-# # #-------------------------------------------------------------------------
-# # size(p::Pose2D) = size(p.ξ)
-# #
-# # #-------------------------------------------------------------------------
-# # # Maths with Pose
-# # #-------------------------------------------------------------------------
-# #
-# # #-------------------------------------------------------------------------
-# # # Inverse
-# # #-------------------------------------------------------------------------
-# # function ⊖(p::Pose2D)::Pose2D
-# #
-# #    p.ξ[1:2,1:2] = p.ξ[1:2,1:2]'
-# #
-# #    p.ξ[1:2,3] = -p.ξ[1:2,1:2] * p.ξ[1:2,3]
-# #
-# #    return p
-# # end
-# # #-------------------------------------------------------------------------
-# # # Product
-# # #-------------------------------------------------------------------------
-# # function ⊕(p1::Pose2D, p2::Pose2D)::Pose2D
-# #    p3 = Pose2D() # Pose type
-# #    p3.ξ = p1.ξ * p2.ξ
-# #    p3.p = p1.p + p1.ξ * p2.p
-# #    p3.θ = p1.θ + p2.θ
-# #    return p3
-# # end
-# #
-# # function *(p::Point2D, p1::Pose2D)::Point2D
-# #    p2 = p1.ξ * [p.x, p.y, 1]
-# #    return Point2D(p2[1], p2[2])
-# # end
-# #
-# # function *(p1::Pose2D, p::Point2D)::Point2D
-# #    p2 = p1.ξ * [p.x, p.y, 1]
-# #    return Point2D(p2[1], p2[2])
-# # end
-# #
-# # function *{T}(p1::Pose2D, p::Array{T, 2})
-# #    p2 = p1.ξ * p
-# #    return Point2D(p2[1], p2[2])
-# # end
-# #
+function skew(number:: T) where T<:Real
+   z = zero(number)
+   @SMatrix [z -number; number z]
+end
+
+function skew(v::AbstractArray{T}) where T<:Real
+   z = zero(T)
+   @SMatrix [  z   -v[3]  v[2];
+             v[3]    z   -v[1];
+            -v[2]   v[1]   z  ]
+end
+
+"""
+Compute the augmented skew-symmetric matrix from a vector `v`
+
+Inputs:
+------
+
+v: Vector
+
+Output:
+------
+
+R: AbstractArray{T}
+"""
+function skewa(v::Vector{T}) where T<:Real
+   z = zero(T)
+   l = length(v)
+   l == 3 || l == 6 || throw(DimensionMismatch("the vector must be of 3 or 6 elements"))
+   if l == 3
+      @SMatrix [skew(v[3]) v[1:2]; z z z]
+   elseif l == 6
+      @SMatrix [skew(v[4:6]) v[1:3]; z z z z]
+   end
+end

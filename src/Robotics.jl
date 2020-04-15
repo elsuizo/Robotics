@@ -29,6 +29,7 @@ export   #types
          angle_vector2rot,
          rot2trans,
          trotx,
+         skew,
          # graphics
          plot_frame,
          # utility
