@@ -32,7 +32,8 @@ using LinearAlgebra
 #=------------------------------------------------------------------------------
 code
 ------------------------------------------------------------------------------=#
-
+# TODO(elsuizo:2020-04-16): tendria que hacer la conversion a rad o deg en las funciones
+# o sino con algun package como UnitfulAngle.jl
 """
 Compute the rotation around the `x` axis(in cartesian coordinates)
 
@@ -261,7 +262,7 @@ function angle_vector2rot(θ::T, v::AbstractArray{T, 1}) where T<:Real
 
    cth = cos(θ)
    sth = sin(θ)
-   vth = (1 - cth)
+   vth = (one(T) - cth)
    v_x = v[1]; v_y = v[2]; v_z = v[3]
    @SMatrix [
       v_x*v_x*vth+cth      v_y*v_x*vth-v_z*sth   v_z*v_x*vth+v_y*sth
@@ -286,7 +287,7 @@ function skew(v::Vector{T}) where T<:Real
             -v[2]   v[1]   z  ]
 end
 
-# TODO(elsuizo): no anda bien asi por los StaticArrays
+# FIXME(elsuizo): No puedo asi como esta convertirlo a StaticArray, porque me tira un error
 """
 Compute the augmented skew-symmetric matrix from a vector `v`
 
@@ -306,15 +307,33 @@ function skewa(v::Vector{T}) where T<:Real
    l == 3 || l == 6 || throw(DimensionMismatch("the vector must be of 3 or 6 elements"))
    # for type-stability
    z = zero(T)
-   z = Scalar(z)
    if l == 3
-      # @SMatrix [skew(v[3]) v[1:2]; z z z]
       [skew(v[3]) v[1:2]; z z z]
    elseif l == 6
-      a = skew(v(4:6))
-      b = @SVector v[1:3]
-      result = @SMatrix zeros(4,4)
-      result[a b; z z z z]
-      # [skew(v[4:6]) v[1:3]; z z z z]
+      [skew(v[4:6]) v[1:3]; z z z z]
    end
+end
+
+function vex(m::AbstractArray{T}) where T<:Real
+   z = zero(T)
+   s = size(m)
+   # check the size of the matrix
+   s == (3, 3) || s == (2, 2) || throw(DimensionMismatch("The matrix must be 2x2 or 3x3"))
+
+   # check if the matrix are skew
+   all(diag(m) .== z) || throw(error("the input must be skew-symetric"))
+
+   if s == (3, 3)
+      result = 0.5 * [m[3,2] - m[2,3]; m[1,3] - m[3,1]; m[2,1] - m[1,2]]
+      convert.(T, result)
+   else
+      result = 0.5 * (m[2,1] - m[1,2])
+      convert.(T, result)
+   end
+end
+
+# TODO(elsuizo:2020-04-16): terminar esta funcion que parece que llama a otras que faltan hacer
+function skewa(m::AbstractArray{T}) where T<:Real
+   # check the size of the matrix
+   s == (4, 4) || s == (3, 3) || throw(DimensionMismatch("The matrix must be 2x2 or 3x3"))
 end

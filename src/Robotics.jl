@@ -31,6 +31,7 @@ export   #types
          trotx,
          skew,
          skewa,
+         vex,
          # graphics
          plot_frame,
          # utility
