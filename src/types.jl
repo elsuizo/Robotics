@@ -24,28 +24,28 @@
 ---------------------------------------------------------------------------=#
 import Base.+
 import Base.-
+import Base.zero
+import Base.convert
 # NOTE(elsuizo:2019-09-04): lo que quiero hacer es que el punto tengo asociado un frame
+# TODO(elsuizo:2020-05-03): no se si queda bien porque hay que estar poniendo todo el tiempo a que frame pertenece
+# cada cosa, por ahora lo dejo para mas adelante
 
 mutable struct Point2D{T<:Real}
    x::T
    y::T
-   frame::Symbol
 end
 
-Point2D() = Point2D(0, 0, :A) # canonical Point2D
+zero(var::Point2D{T}) where T<:Real = Point2D(zero(T), zero(T))
 
-function +(p1::Point2D, p2::Point2D)
-   if p1.frame == p2.frame
-      Point2D(p1.x + p2.x, p1.y + p2.y, p1.frame)
-   else
-      error("The frames of two points must be equals")
-   end
-end
+convert(::Type{Point2D{T}}, p::Point2D{S}) where {T<:Real,S<:Real} = Point2D(convert(T, p.x), convert(T, p.y))
 
-function -(p1::Point2D, p2::Point2D)
-   if p1.frame == p2.frame
-      Point2D(p1.x - p2.x, p1.y - p2.y, p1.frame)
-   else
-      error("The frames of two points must be equals")
-   end
-end
+Point2D() = Point2D(0, 0)
+
+
+"""
+Create a pose Matrix
+"""
+ξ(θ::T, x::T, y::T) where T<:Real = @SMatrix [cos(θ) -sin(θ) x;sin(θ) cos(θ) y; 0.0 0.0 1.0]
+#
+ξ(θ::T, p::Point2D{T}) where T<:Real = @SMatrix [cos(θ) -sin(θ) x;sin(θ) cos(θ) y; 0.0 0.0 1.0]
+

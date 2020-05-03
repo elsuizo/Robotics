@@ -34,6 +34,19 @@ code
 ------------------------------------------------------------------------------=#
 # TODO(elsuizo:2020-04-16): tendria que hacer la conversion a rad o deg en las funciones
 # o sino con algun package como UnitfulAngle.jl
+
+function rot2(θ::Real)
+    @SMatrix [cos(θ) -sin(θ);
+              sin(θ)   cos(θ)]
+end
+
+function trot2(θ::Real)
+   R = @SMatrix zeros(3, 3)
+   R[:, end] = [0.0, 0.0, 1.0]
+   R[1:2, 1:2] = rot2(θ)
+   return R
+end
+
 """
 Compute the rotation around the `x` axis(in cartesian coordinates)
 
@@ -200,9 +213,9 @@ R: Rotation matrix(Array{Float64, 2})
 Outputs:
 ------
 
-ϕ: first angle of euler(Number)
-θ: second angle of euler(Number)
-ψ: third angle of euler(Number)
+ϕ: first angle of euler(radian Number)
+θ: second angle of euler(radian Number)
+ψ: third angle of euler(radian Number)
 
 """
 function rot2euler(R::AbstractArray{T, 2}) where T<:Real
@@ -212,18 +225,18 @@ function rot2euler(R::AbstractArray{T, 2}) where T<:Real
         ϕ = 0.0
         sp = 0.0
         cp = 1.0
-        θ = atand(cp * R[1, 3] + sp * R[2, 3], R[3, 3])
-        ψ = atand(-sp * R[1, 1] + cp * R[2, 1], -sp * R[1, 2] + cp * R[2, 2])
+        θ = atan(cp * R[1, 3] + sp * R[2, 3], R[3, 3])
+        ψ = atan(-sp * R[1, 1] + cp * R[2, 1], -sp * R[1, 2] + cp * R[2, 2])
     else
         # non-singular
-        ϕ = atand(R[2, 3], R[1, 3])
+        ϕ = atan(R[2, 3], R[1, 3])
         sp = sin(ϕ)
         cp = cos(ϕ)
-        θ = atand(cp * R[1, 3] + sp * R[2, 3], R[3, 3])
-        ψ = atand(-sp * R[1, 1] + cp * R[2, 1], -sp * R[1, 2] + cp * R[2, 2])
+        θ = atan(cp * R[1, 3] + sp * R[2, 3], R[3, 3])
+        ψ = atan(-sp * R[1, 1] + cp * R[2, 1], -sp * R[1, 2] + cp * R[2, 2])
     end
 
-    return ϕ, θ, ψ
+    return rad2deg(ϕ), rad2deg(θ), rad2deg(ψ)
 end
 
 """
@@ -333,7 +346,7 @@ function vex(m::AbstractArray{T}) where T<:Real
 end
 
 # TODO(elsuizo:2020-04-16): terminar esta funcion que parece que llama a otras que faltan hacer
-function skewa(m::AbstractArray{T}) where T<:Real
+function vexa(m::AbstractArray{T}) where T<:Real
    # check the size of the matrix
    s == (4, 4) || s == (3, 3) || throw(DimensionMismatch("The matrix must be 2x2 or 3x3"))
 end

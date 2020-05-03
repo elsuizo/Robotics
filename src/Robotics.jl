@@ -17,9 +17,10 @@ include("types.jl")
                               Exports
 ------------------------------------------------------------------------------=#
 export   #types
-         Point2D, # TODO(elsuizo:2019-09-04): proximamente
-         Pose2D,  # TODO(elsuizo:2019-09-04): proximamente
+         Point2D,
          #methods
+         rot2,
+         trot2,
          rotx,
          roty,
          rotz,
