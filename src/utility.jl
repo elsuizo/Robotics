@@ -2,3 +2,7 @@
 #    vec = [Pose2D(rand(range),rand(range),deg2rad(rand(0:360))) for p in 1:n]
 #    return vec
 # end
+#
+function is_rotation(m::AbstractMatrix{T})
+
+end

@@ -41,7 +41,6 @@ convert(::Type{Point2D{T}}, p::Point2D{S}) where {T<:Real,S<:Real} = Point2D(con
 
 Point2D() = Point2D(0, 0)
 
-
 """
 Create a pose Matrix
 """

@@ -73,7 +73,6 @@ function rotx(θ::Real)
    return Rₓ
 end
 
-
 """
 Compute the rotation around the `y` axis(in cartesian coordinates)
 

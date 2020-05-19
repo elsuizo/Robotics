@@ -19,6 +19,7 @@ include("types.jl")
 export   #types
          Point2D,
          #methods
+         ξ,
          rot2,
          trot2,
          rotx,
